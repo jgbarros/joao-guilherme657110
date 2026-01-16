@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: Joao Guilherme 657110 - Music API
+  datasource:
+    url: jdbc:postgresql://postgres:5432/musicdb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+security:
+  jwt:
+    secret: music-api-senior-seplag-657110-supersecret123!@#
+    expiration: 300000
+    refresh-expiration: 604800000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org:
+      springframework:
+        security: OFF
