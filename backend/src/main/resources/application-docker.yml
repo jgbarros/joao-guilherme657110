@@ -17,6 +17,12 @@ spring:
     connect-retries: 10
     connect-retries-interval: 500
 
+minio:
+  endpoint: http://minio:9001
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: music-covers
+
 management:
   endpoints:
     web:
