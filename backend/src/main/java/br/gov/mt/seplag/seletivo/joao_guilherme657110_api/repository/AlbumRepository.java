@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 public interface AlbumRepository extends JpaRepository<Album, Long>, JpaSpecificationExecutor<Album> {
-
-    @Query("SELECT a FROM Album a JOIN FETCH a.artista ORDER BY a.titulo")
+    
+    @Query("SELECT a FROM Album a JOIN FETCH a.artista LEFT JOIN FETCH a.regional ORDER BY a.titulo")
     Page<Album> findAllOrdered(Pageable pageable);
 }

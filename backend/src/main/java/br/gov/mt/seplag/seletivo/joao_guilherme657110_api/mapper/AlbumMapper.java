@@ -20,6 +20,8 @@ public class AlbumMapper {
                 .faixas(entity.getFaixas())
                 .artistaId(entity.getArtista() != null ? entity.getArtista().getId() : null)
                 .artistaNome(entity.getArtista() != null ? entity.getArtista().getNome() : null)
+                .regionalId(entity.getRegional() != null ? entity.getRegional().getId() : null)
+                .regionalNome(entity.getRegional() != null ? entity.getRegional().getNome() : null)
                 .build();
     }
 }

@@ -33,4 +33,8 @@ public class Album {
     @ManyToOne
     @JoinColumn(name = "artista_id")
     private Artista artista;
+
+    @ManyToOne
+    @JoinColumn(name = "regional_id")
+    private Regional regional;
 }
