@@ -1,11 +1,11 @@
 CREATE TABLE regionais (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     nome VARCHAR(100) UNIQUE NOT NULL,
     ativo BOOLEAN DEFAULT true
 );
 
 CREATE TABLE artistas (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     nome VARCHAR(200) UNIQUE NOT NULL,
     nacionalidade VARCHAR(100),
     data_nascimento DATE,
@@ -14,14 +14,14 @@ CREATE TABLE artistas (
 );
 
 CREATE TABLE albuns (
-    id SERIAL PRIMARY KEY,
-    artista_id INTEGER REFERENCES artistas(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    artista_id BIGINT REFERENCES artistas(id) ON DELETE CASCADE,
     titulo VARCHAR(300) NOT NULL,
     ano_lancamento INTEGER CHECK (ano_lancamento > 1900),
     genero VARCHAR(100),
     capa_url VARCHAR(500),
     faixas JSONB,
-    regional_id INTEGER REFERENCES regionais(id)
+    regional_id BIGINT REFERENCES regionais(id)
 );
 
 -- Índices para performance (paginação/busca)
