@@ -4,9 +4,11 @@ import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.AlbumRequest;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.AlbumResponse;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.entity.Album;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.entity.Artista;
+import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.entity.Regional;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.mapper.AlbumMapper;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.repository.AlbumRepository;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.repository.ArtistaRepository;
+import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.repository.RegionalRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +23,7 @@ public class AlbumService {
 
     private final AlbumRepository repository;
     private final ArtistaRepository artistaRepository;
+    private final RegionalRepository regionalRepository;
     private final AlbumMapper mapper;
 
     public Page<AlbumResponse> findAll(Pageable pageable, String filtro) {
@@ -68,6 +71,12 @@ public class AlbumService {
                 .orElseThrow(() -> new EntityNotFoundException("Artista não encontrado"));
         album.setArtista(artista);
 
-        // TODO: Regional
+        if (req.getRegionalId() != null) {
+            Regional regional = regionalRepository.findById(req.getRegionalId())
+                    .orElseThrow(() -> new EntityNotFoundException("Regional não encontrada"));
+            album.setRegional(regional);
+        } else {
+            album.setRegional(null);
+        }
     }
 }
