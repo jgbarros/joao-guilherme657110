@@ -11,10 +11,15 @@ import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.repository.ArtistaRepo
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.repository.RegionalRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +63,13 @@ public class AlbumService {
 
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    public void updateCapa(Long id, String url) {
+        Album album = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Álbum não encontrado"));
+        album.setCapaUrl(url);
+        repository.save(album);
     }
 
     private void updateEntity(Album album, AlbumRequest req) {

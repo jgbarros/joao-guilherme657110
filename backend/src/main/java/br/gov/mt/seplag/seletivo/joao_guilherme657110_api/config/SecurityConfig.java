@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/albuns/upload/**").permitAll() // temporario para testes
                         .requestMatchers("/api/artistas/**").authenticated()
                         .requestMatchers("/api/albuns/**").authenticated()
                         .requestMatchers("/api/regionais/**").authenticated()
