@@ -2,13 +2,13 @@ spring:
   application:
     name: Joao Guilherme 657110 - Music API
   datasource:
-    url: jdbc:postgresql://postgres:5432/musicdb
+    url: jdbc:postgresql://localhost:5432/musicdb
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: true
   flyway:
     enabled: true
