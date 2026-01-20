@@ -23,6 +23,11 @@ minio:
   secret-key: minioadmin
   bucket: music-covers
 
+jwt:
+  secret: music-api-senior-seplag-657110-supersecret123!@#$(2026)
+  expiration: 300000     # 5min ms
+  refresh-expiration: 604800000  # 7 dias
+
 management:
   endpoints:
     web:
