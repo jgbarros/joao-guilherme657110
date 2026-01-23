@@ -1,12 +1,12 @@
-# joao-guilherme657110
+# Repositório: joao-guilherme657110
 
 # João Guilherme Barros - 657110 - Full Stack Sênior SEPLAG-MT 🚀
 
 **Processo Seletivo 001/2026 - Anexo II-C: Implementação Full Stack Java + React** [file:1]
 
-[![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%203.2-brightgreen)] [![Frontend](https://img.shields.io/badge/Frontend-React%2018-blue)] [![DB](https://img.shields.io/badge/DB-PostgreSQL%2016-orange)] [![Object](https://img.shields.io/badge/Object-MinIO-red)]
+[![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%204.0.1-brightgreen)] [![Frontend](https://img.shields.io/badge/Frontend-React%2018-blue)] [![DB](https://img.shields.io/badge/DB-PostgreSQL%2016-orange)] [![Object](https://img.shields.io/badge/Object-MinIO-red)]
 
-## 🔧 Status Atual (16/01/2026)
+## 🔧 Status Atual (23/01/2026)
 - ✅ **Infra Docker**: Postgres + MinIO + Backend UP
 - ✅ **Flyway**: Schema + seed data (users, artistas, albuns, regionais)
 - ✅ **JPA**: Entities Artista/Album/Regional/User
@@ -16,7 +16,7 @@
 - ✅ **WebSocket**: Real-time artistas/álbuns (broadcast)
 - ⏳ **Próximo**: Frontend React
 
-## 🚀 Como rodar (2min)
+## 🚀 Como rodar o Docker
 
 ```bash
 git clone https://github.com/jgbarros/joao-guilherme657110
@@ -30,7 +30,7 @@ docker compose up -d
 | **PostgreSQL** | `localhost:5432` | `musicdb` / `postgres` / `postgres` |
 | **MinIO Console** | [localhost:9001](http://localhost:9001) | `minioadmin` / `minioadmin` |
 | **MinIO Browser** | [localhost:9001/browser](http://localhost:9001) | `minioadmin` / `minioadmin` |
-| **Backend API** | `localhost:8080` | - |
+| **Backend API** | [localhost:8080/](http://localhost:8080) | `admin` / `admin123` |
 
 
 
@@ -56,10 +56,14 @@ DELETE /api/artistas/{id}
 ```
 
 
-### **Álbuns** (Similar CRUD)
+### **Álbuns** (Protegido ROLE_USER+)
 
 ```
-GET/POST/PUT/DELETE /api/albuns + paginação/filtros
+GET    /api/albuns?page=0&size=10&filtro=Serj
+POST   /api/albuns (cria → dispara WebSocket)
+POST   /api/albuns/upload (multipart file)
+PUT    /api/albuns/{id}
+DELETE /api/albuns/{id}
 ```
 
 
@@ -73,56 +77,30 @@ ws://localhost:8080/ws/albuns    ← Álbuns
 ```
 
 
-### **Teste Postman WebSocket:**
+### **Notificações Postman WebSocket:**
 
 ```
 1. New → WebSocket Request
 2. URL: ws://localhost:8080/ws/artistas → Connect
-3. Recebe mensagens text/JSON de broadcast
-4. Envia texto → Echo nos logs
+3. Message: Mensagens text/JSON de broadcast
+SUBSCRIBE
+id:sub-0
+destination:/topic/artistas
+
+^@
+4. Envia texto → Echo nos logs → Send
+
+
 ```
 
 **Exemplo fluxo:**
 
 ```
-Cliente1: ws://localhost:8080/ws/artistas (conecta)
+Cliente1: ws://localhost:8080/ws/artistas (Conecta)
 Cliente2: POST /api/artistas "Novo Artista" 
 → Service chama artistaHandler.broadcast("Artista criado!")
 → Cliente1 recebe JSON real-time!
 ```
-
-
-## 🛠 **Infra Docker Compose**
-
-```yaml
-services:
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: seplag_music
-      POSTGRES_USER: seplag
-      POSTGRES_PASSWORD: seplag123
-    ports: ["5432:5432"]
-
-  minio:
-    image: minio/minio:latest
-    ports: ["9000:9000", "9001:9001"]
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    command: server /data --console-address ":9001"
-
-  backend:
-    build: .
-    ports: ["8080:8080"]
-    depends_on:
-      - postgres
-      - minio
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/seplag_music
-      MINIO_URL: http://minio:9000
-```
-
 
 ## 🔑 **Credenciais Teste**
 
