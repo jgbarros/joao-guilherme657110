@@ -66,3 +66,7 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@layer tailwind-base, primereact, tailwind-utilities;
+@import 'primeflex/primeflex.css';
+@tailwind base; @tailwind components; @tailwind utilities;
