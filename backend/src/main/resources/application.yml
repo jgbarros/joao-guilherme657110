@@ -41,9 +41,14 @@ management:
 
 server:
   port: 8080
+  http2:
+    enabled: false # Evita conflito Postman
 
 logging:
   level:
     org:
       springframework:
         security: OFF
+        web:
+          socket: DEBUG
+        messaging: DEBUG
