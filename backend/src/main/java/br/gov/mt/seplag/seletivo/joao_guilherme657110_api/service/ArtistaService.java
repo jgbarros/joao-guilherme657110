@@ -44,6 +44,10 @@ public class ArtistaService {
         return mapper.toResponse(artista);
     }
 
+    public long count() {
+        return repository.count();
+    }
+
     public ArtistaResponse create(ArtistaRequest request) {
         Artista artista = new Artista();
         updateEntity(artista, request);

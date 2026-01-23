@@ -46,6 +46,10 @@ public class RegionalService {
         return mapper.toResponse(regional);
     }
 
+    public long count() {
+        return repository.count();
+    }
+
     public RegionalResponse create(RegionalRequest request) {
         Regional regional = new Regional();
         updateEntity(regional, request);

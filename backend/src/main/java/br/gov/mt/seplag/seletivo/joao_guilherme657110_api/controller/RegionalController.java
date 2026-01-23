@@ -41,6 +41,11 @@ public class RegionalController {
         return ResponseEntity.ok(service.findById(id));
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> count() {
+        return ResponseEntity.ok(service.count());
+    }
+
     @PostMapping
     public ResponseEntity<RegionalResponse> create(@Validated @RequestBody RegionalRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(req));

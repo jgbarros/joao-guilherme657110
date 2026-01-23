@@ -34,6 +34,11 @@ public class ArtistaController {
         return ResponseEntity.ok(service.findById(id));
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> count() {
+        return ResponseEntity.ok(service.count());
+    }
+
     @PostMapping
     public ResponseEntity<ArtistaResponse> create(@Validated @RequestBody ArtistaRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(req));

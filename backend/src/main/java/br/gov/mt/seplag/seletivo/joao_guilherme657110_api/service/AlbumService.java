@@ -50,6 +50,10 @@ public class AlbumService {
         return mapper.toResponse(album);
     }
 
+    public long count() {
+        return repository.count();
+    }
+
     public AlbumResponse create(AlbumRequest request) {
         Album album = new Album();
         updateEntity(album, request);
