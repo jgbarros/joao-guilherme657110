@@ -41,6 +41,11 @@ public class AlbumController {
         return ResponseEntity.ok(service.findById(id));
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> count() {
+        return ResponseEntity.ok(service.count());
+    }
+
     @PostMapping
     public ResponseEntity<AlbumResponse> create(@Validated @RequestBody AlbumRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(req));
