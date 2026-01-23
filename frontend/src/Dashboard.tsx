@@ -1,6 +1,8 @@
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
+import { Divider } from "primereact/divider";
 import { useNavigate } from 'react-router-dom';
+import StatCard from "./components/StatCard.tsx";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -12,78 +14,84 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex align-items-center justify-content-center min-h-screen">
-      <Card title="Dashboard" className="w-50rem">
-        <div className="text-center mb-4">
-          <h2>Bem-vindo ao Dashboard!</h2>
-          <p>Você está autenticado com sucesso.</p>
-        </div>
+      <div className="flex align-items-center justify-content-center min-h-screen p-3 surface-ground">
+        <Card title="Dashboard" className="w-full md:w-11 shadow-2">
+          {token && (
+              <div className="p-0">
+                  <div className="mb-4">
+                      <p className="text-500">Gerencie seus artistas, álbuns e consulte regionais</p>
+                  </div>
 
-        {token && (
-          <Card className="mb-4" title="Token de Autenticação">
-            <div className="field">
-              <label htmlFor="token" className="font-bold">Seu Token JWT:</label>
-              <div className="mt-2">
-                <div 
-                  style={{
-                    backgroundColor: '#f8f9fa',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '4px',
-                    padding: '12px',
-                    fontFamily: 'monospace',
-                    fontSize: '12px',
-                    wordBreak: 'break-all',
-                    maxHeight: '150px',
-                    overflowY: 'auto'
-                  }}
-                >
-                  {token}
-                </div>
-              </div>
-              <div className="mt-2">
-                <small className="text-500">
-                  Este token é usado para autenticar requisições à API
-                </small>
-              </div>
-            </div>
-          </Card>
-        )}
-        
-        <div className="grid">
-          <div className="col-12 md:col-4">
-            <Card className="text-center">
-              <h3>Estatísticas</h3>
-              <p>Visualize suas estatísticas aqui</p>
-            </Card>
-          </div>
-          <div className="col-12 md:col-4">
-            <Card className="text-center">
-              <h3>Relatórios</h3>
-              <p>Acesse seus relatórios</p>
-            </Card>
-          </div>
-          <div className="col-12 md:col-4">
-            <Card className="text-center">
-              <h3>Configurações</h3>
-              <p>Gerencie suas configurações</p>
-            </Card>
-          </div>
-        </div>
+                  <div className="flex flex-column md:flex-row align-items-start gap-4 p-2 w-full max-w-6xl mx-auto">
+                      <StatCard title="Artistas" value={0} icon="pi-users" color="#3b82f6"/>
+                      <StatCard title="Albums" value={0} icon="pi-folder" color="#22c55e"/>
+                      <StatCard title="Regionais" value={0} icon="pi-map-marker" color="#f97316"/>
 
-        <div className="text-center mt-4">
-          <Button 
-            label="Gerenciar Artistas" 
-            icon="pi pi-users" 
-            onClick={() => navigate('/artistas')}
-            className="mr-2"
-          />
-          <Button 
-            label="Sair" 
-            onClick={handleLogout} 
-            className="p-button-danger" 
-          />
-        </div>
-      </Card>
-    </div>
+                      <div className="col-12 md:col-6">
+                          <Card title={<><i className="pi pi-bolt mr-2"/>Ações Rápidas</>}>
+                              <div className="flex flex-column gap-3">
+                                  <Button
+                                      label="Gerenciar Artistas"
+                                      icon="pi pi-users"
+                                      onClick={() => navigate('/artistas')}
+                                      className="p-button-outlined"
+                                  />
+
+                                  <Button
+                                      label="Gerenciar Álbuns"
+                                      icon="pi pi-book"
+                                      onClick={() => navigate('/albuns')}
+                                      className="p-button-outlined"
+                                  />
+
+                              </div>
+                          </Card>
+                      </div>
+                  </div>
+
+
+                  <Divider/>
+
+                  <div className="flex flex-column md:flex-row gap-4 p-2 w-full max-w-6xl mx-auto">
+                      <div className="col-12 md:col-6">
+                          <Card title="Sobre o Sistema">
+                              <p className="text-700 mb-3">
+                                  Este sistema permite gerenciar seu catálogo musical de forma simples
+                                  e eficiente.
+                              </p>
+                              <ul className="pl-3 text-600">
+                                  <li>Cadastre e gerencie artistas</li>
+                                  <li>Organize álbuns por artista</li>
+                                  <li>Consultar informações Regionais da API: <a href="https://integrador-argus-api.geia.vip/v1/regionais" target="_blank" rel="noopener noreferrer">Regionais</a></li>
+                              </ul>
+                          </Card>
+                      </div>
+                  </div>
+
+                  <div className="text-center mt-4">
+                      <Button
+                          label="Gerenciar Artistas"
+                          icon="pi pi-users"
+                          onClick={() => navigate('/artistas')}
+                          className="mr-2"
+                      />
+                      <Button
+                          label="Gerenciar Álbuns"
+                          icon="pi pi-book"
+                          onClick={() => navigate('/albuns')}
+                          className="mr-2"
+                      />
+                      <Button
+                          label="Sair"
+                          icon="pi pi-sign-out"
+                          onClick={handleLogout}
+                          className="p-button-danger"
+                      />
+                  </div>
+
+              </div>
+          )}
+        </Card>
+      </div>
   );
 }
