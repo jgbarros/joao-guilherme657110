@@ -1,5 +1,7 @@
 package br.gov.mt.seplag.seletivo.joao_guilherme657110_api.service;
 
+import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.config.handler.AlbumWebSocketHandler;
+import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.ws.AlbumNotification;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.AlbumRequest;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.AlbumResponse;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.entity.Album;
@@ -11,15 +13,14 @@ import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.repository.ArtistaRepo
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.repository.RegionalRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class AlbumService {
     private final ArtistaRepository artistaRepository;
     private final RegionalRepository regionalRepository;
     private final AlbumMapper mapper;
+    private final AlbumWebSocketHandler webSocketHandler;
 
     public Page<AlbumResponse> findAll(Pageable pageable, String filtro) {
         if (filtro != null && !filtro.isBlank()) {
@@ -51,7 +53,23 @@ public class AlbumService {
     public AlbumResponse create(AlbumRequest request) {
         Album album = new Album();
         updateEntity(album, request);
-        return mapper.toResponse(repository.save(album));
+        Album savedAlbum = repository.save(album);
+
+        // Prepara a notificação
+        Map<String, Object> notification = new HashMap<>();
+        notification.put("type", "ALBUM_CRIADO");
+        notification.put("data", AlbumNotification.builder()
+                .albumId(savedAlbum.getId())
+                .albumTitle(savedAlbum.getTitulo())
+                .artistName(savedAlbum.getArtista().getNome())
+                .createdAt(LocalDateTime.now())
+                .message("Novo álbum cadastrado com sucesso!")
+                .build());
+
+        // Envia notificação via WebSocket Nativo
+        webSocketHandler.broadcast(notification);
+
+        return mapper.toResponse(savedAlbum);
     }
 
     public AlbumResponse update(Long id, AlbumRequest request) {

@@ -18,7 +18,6 @@ public class ArtistaMapper {
         artista.setDataNascimento(response.getDataNascimento());
         artista.setDataMorte(response.getDataMorte());
         artista.setBiografia(response.getBiografia());
-        // albumCount não é mapeado de volta para a entidade pois é um campo calculado/agregado
         return artista;
     }
 

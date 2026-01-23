@@ -1,5 +1,7 @@
 package br.gov.mt.seplag.seletivo.joao_guilherme657110_api.service;
 
+import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.config.handler.ArtistaWebSocketHandler;
+import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.ws.ArtistaNotification;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.mapper.ArtistaMapper;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.ArtistaRequest;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.ArtistaResponse;
@@ -12,6 +14,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -19,6 +25,7 @@ public class ArtistaService {
 
     private final ArtistaRepository repository;
     private final ArtistaMapper mapper;
+    private final ArtistaWebSocketHandler webSocketHandler;
 
     public Page<ArtistaResponse> findAll(Pageable pageable, String filtro) {
         if (filtro != null && !filtro.isBlank()) {
@@ -40,7 +47,22 @@ public class ArtistaService {
     public ArtistaResponse create(ArtistaRequest request) {
         Artista artista = new Artista();
         updateEntity(artista, request);
-        return mapper.toResponse(repository.save(artista));
+        Artista savedArtista = repository.save(artista);
+
+        // Prepara a notificação
+        Map<String, Object> notification = new HashMap<>();
+        notification.put("type", "ARTISTA_CRIADO");
+        notification.put("data", ArtistaNotification.builder()
+                .artistId(savedArtista.getId())
+                .artistName(savedArtista.getNome())
+                .createdAt(LocalDateTime.now())
+                .message("Novo artista cadastrado com sucesso!")
+                .build());
+
+        // Envia notificação via WebSocket Nativo
+        webSocketHandler.broadcast(notification);
+
+        return mapper.toResponse(savedArtista);
     }
 
     public ArtistaResponse update(Long id, ArtistaRequest request) {
