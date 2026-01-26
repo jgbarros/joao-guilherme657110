@@ -2,10 +2,10 @@ import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Divider } from "primereact/divider";
 import { useNavigate } from 'react-router-dom';
-import StatCard from "./components/StatCard.tsx";
+import StatCard from "../components/StatCard.tsx";
 import { useEffect, useState } from 'react';
-import api from './api/axios';
-import RegionalApiService from './services/RegionalApiService';
+import api from '../api/axios';
+import RegionalApiService from '../services/RegionalApiService';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ export default function Dashboard() {
 
                   <div className="flex flex-column md:flex-row align-items-start gap-4 p-2 w-full max-w-6xl mx-auto">
                       <StatCard title="Artistas" value={totalArtistas} icon="pi-users" color="#3b82f6"/>
-                      <StatCard title="Albums" value={totalAlbuns} icon="pi-folder" color="#22c55e"/>
+                      <StatCard title="Álbuns" value={totalAlbuns} icon="pi-folder" color="#22c55e"/>
                       <StatCard title="Regionais (Local)" value={totalRegionais} icon="pi-map-marker" color="#e67e22"/>
                       <StatCard title="Regionais (Api)" value={totalRegionaisApi} icon="pi-map-marker" color="#c0392b"/>
 

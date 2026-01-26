@@ -1,10 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
-import api from './api/axios';
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
+import { Toast } from 'primereact/toast';
+import { Dialog } from 'primereact/dialog';
+import api from '../api/axios';
+import ArtistForm from './ArtistForm';
 
 interface Artista {
   id: number;
@@ -55,13 +59,17 @@ export default function ArtistList() {
     totalElements: 0,
     totalPages: 0
   });
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [selectedArtistId, setSelectedArtistId] = useState<number | null>(null);
   const navigate = useNavigate();
+  const toast = useRef<Toast>(null);
 
   useEffect(() => {
-    fetchArtistas();
+    fetchArtistas(pagination.page, pagination.size);
   }, []);
 
   const fetchArtistas = async (page: number = 0, size: number = 10) => {
+    setLoading(true);
     try {
       const response = await api.get(`/api/artistas?page=${page}&size=${size}`);
       const data: PaginatedResponse = response.data;
@@ -76,9 +84,48 @@ export default function ArtistList() {
     } catch (err: any) {
       console.error('Erro ao buscar artistas:', err);
       setError('Erro ao carregar artistas. Verifique se o backend está rodando.');
+      if (toast.current) {
+        toast.current.show({ severity: 'error', summary: 'Erro', detail: 'Não foi possível carregar os artistas.' });
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = (id: number) => {
+    confirmDialog({
+      message: 'Tem certeza que deseja excluir este artista?',
+      header: 'Confirmação de Exclusão',
+      icon: 'pi pi-exclamation-triangle',
+      acceptClassName: 'p-button-danger',
+      acceptLabel: 'Sim, excluir',
+      rejectLabel: 'Cancelar',
+      accept: async () => {
+        try {
+          await api.delete(`/api/artistas/${id}`);
+          toast.current?.show({ severity: 'success', summary: 'Sucesso', detail: 'Artista excluído com sucesso!' });
+          fetchArtistas(pagination.page, pagination.size);
+        } catch (error: any) {
+          console.error('Erro ao excluir artista:', error);
+          const errorMessage = error.response?.data?.message || error.response?.data || 'Não foi possível excluir o artista.';
+          toast.current?.show({ 
+            severity: 'error', 
+            summary: 'Erro', 
+            detail: typeof errorMessage === 'string' ? errorMessage : 'Erro ao excluir o artista.' 
+          });
+        }
+      }
+    });
+  };
+
+  const handleOpenForm = (id: number | null = null) => {
+    setSelectedArtistId(id);
+    setDialogVisible(true);
+  };
+
+  const handleFormSuccess = () => {
+    setDialogVisible(false);
+    fetchArtistas(pagination.page, pagination.size);
   };
 
   const handleLogout = () => {
@@ -96,12 +143,12 @@ export default function ArtistList() {
         <Button 
           icon="pi pi-pencil" 
           className="p-button-rounded p-button-success p-button-text" 
-          onClick={() => console.log('Editar:', rowData)}
+          onClick={() => handleOpenForm(rowData.id)}
         />
         <Button 
           icon="pi pi-trash" 
           className="p-button-rounded p-button-danger p-button-text" 
-          onClick={() => console.log('Excluir:', rowData)}
+          onClick={() => handleDelete(rowData.id)}
         />
       </div>
     );
@@ -109,6 +156,8 @@ export default function ArtistList() {
 
   return (
     <div className="p-4">
+      <Toast ref={toast} />
+      <ConfirmDialog />
       <Card title="Lista de Artistas" className="mb-4">
         <div className="flex justify-content-between align-items-center mb-4">
           <Button 
@@ -147,6 +196,7 @@ export default function ArtistList() {
           className="p-datatable-sm"
           lazy
           paginator
+          first={pagination.page * pagination.size}
           rows={pagination.size}
           totalRecords={pagination.totalElements}
           onPage={(event) => fetchArtistas(event.page, event.rows)}
@@ -180,10 +230,24 @@ export default function ArtistList() {
             label="Adicionar Artista" 
             icon="pi pi-plus" 
             className="p-button-success"
-            onClick={() => console.log('Adicionar novo artista')}
+            onClick={() => handleOpenForm()}
           />
         </div>
       </Card>
+
+      <Dialog 
+        header={selectedArtistId ? 'Editar Artista' : 'Novo Artista'}
+        visible={dialogVisible} 
+        style={{ width: '50vw' }} 
+        onHide={() => setDialogVisible(false)}
+        maximizable
+      >
+        <ArtistForm 
+          artistId={selectedArtistId} 
+          onSuccess={handleFormSuccess} 
+          onCancel={() => setDialogVisible(false)}
+        />
+      </Dialog>
     </div>
   );
 }
