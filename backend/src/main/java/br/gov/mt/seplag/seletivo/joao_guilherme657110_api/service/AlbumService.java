@@ -19,8 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -99,7 +102,16 @@ public class AlbumService {
         album.setAnoLancamento(req.getAnoLancamento());
         album.setGenero(req.getGenero());
         album.setCapaUrl(req.getCapaUrl());
-        album.setFaixas(req.getFaixas());
+        
+        if (req.getFaixas() != null && !req.getFaixas().isBlank()) {
+            List<String> faixas = Arrays.stream(req.getFaixas().split(","))
+                    .map(String::trim)
+                    .filter(f -> !f.isEmpty())
+                    .collect(Collectors.toList());
+            album.setFaixas(faixas);
+        } else {
+            album.setFaixas(List.of());
+        }
 
         Artista artista = artistaRepository.findById(req.getArtistaId())
                 .orElseThrow(() -> new EntityNotFoundException("Artista não encontrado"));

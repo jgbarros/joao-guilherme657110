@@ -49,6 +49,7 @@ public class ArtistaService {
     }
 
     public ArtistaResponse create(ArtistaRequest request) {
+        validateDateRange(request);
         Artista artista = new Artista();
         updateEntity(artista, request);
         Artista savedArtista = repository.save(artista);
@@ -70,6 +71,7 @@ public class ArtistaService {
     }
 
     public ArtistaResponse update(Long id, ArtistaRequest request) {
+        validateDateRange(request);
         ArtistaResponse artistaResponse = findById(id);
         Artista artista = mapper.toEntity(artistaResponse);
         updateEntity(artista, request);
@@ -82,8 +84,17 @@ public class ArtistaService {
 
     private void updateEntity(Artista artista, ArtistaRequest req) {
         artista.setNome(req.getNome());
-        //artista.setNacionalidade(req.getNacionalidade());
-        //artista.setDataNascimento(req.getDataNascimento());
-        // ...
+        artista.setNacionalidade(req.getNacionalidade());
+        artista.setDataNascimento(req.getDataNascimento());
+        artista.setDataMorte(req.getDataMorte());
+        artista.setBiografia(req.getBiografia());
+    }
+
+    private void validateDateRange(ArtistaRequest request) {
+        if (request.getDataNascimento() != null && request.getDataMorte() != null) {
+            if (request.getDataNascimento().isAfter(request.getDataMorte())) {
+                throw new IllegalArgumentException("A data de nascimento não pode ser posterior à data de morte.");
+            }
+        }
     }
 }

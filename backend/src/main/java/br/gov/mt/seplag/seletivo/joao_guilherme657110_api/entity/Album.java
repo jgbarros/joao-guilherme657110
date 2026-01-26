@@ -5,6 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.util.List;
+
 @Entity
 @Table(name = "albuns")
 @Data
@@ -27,8 +32,8 @@ public class Album {
     @Column(name = "capa_url", length = 500)
     private String capaUrl;
 
-    @Column(columnDefinition = "JSONB")
-    private String faixas;
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> faixas;
     
     @ManyToOne
     @JoinColumn(name = "artista_id")

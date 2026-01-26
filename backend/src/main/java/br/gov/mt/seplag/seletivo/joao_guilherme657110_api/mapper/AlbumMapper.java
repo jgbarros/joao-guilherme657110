@@ -17,7 +17,7 @@ public class AlbumMapper {
                 .anoLancamento(entity.getAnoLancamento())
                 .genero(entity.getGenero())
                 .capaUrl(entity.getCapaUrl())
-                .faixas(entity.getFaixas())
+                .faixas(entity.getFaixas() != null ? String.join(", ", entity.getFaixas()) : null)
                 .artistaId(entity.getArtista() != null ? entity.getArtista().getId() : null)
                 .artistaNome(entity.getArtista() != null ? entity.getArtista().getNome() : null)
                 .regionalId(entity.getRegional() != null ? entity.getRegional().getId() : null)

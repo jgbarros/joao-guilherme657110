@@ -26,6 +26,7 @@ security:
 
 minio:
   url: http://minio:9000
+  api-url: http://localhost:9001/api/v1
   access-key: minioadmin
   secret-key: minioadmin
   bucket: seplag-bucket
