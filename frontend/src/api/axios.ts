@@ -23,7 +23,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
+    // Não redirecionar se o erro ocorrer na rota de autenticação
+    const isAuthRoute = error.config?.url?.includes('/api/auth/authenticate');
+    
+    if (error.response?.status === 401 && !isAuthRoute) {
       localStorage.removeItem('token');
       window.location.href = '/';
     }
