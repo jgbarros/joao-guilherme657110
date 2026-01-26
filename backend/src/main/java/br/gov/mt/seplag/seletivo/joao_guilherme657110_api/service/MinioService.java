@@ -1,11 +1,9 @@
 package br.gov.mt.seplag.seletivo.joao_guilherme657110_api.service;
 
 import io.minio.BucketExistsArgs;
-import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.http.Method;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +16,9 @@ public class MinioService {
 
     @Value("${minio.bucket}")
     private String bucketName;
+
+    @Value("${minio.api-url}")
+    private String minioApiUrl;
 
     @PostConstruct
     public void initBucket() {
@@ -45,13 +46,6 @@ public class MinioService {
                 .contentType(file.getContentType())
                 .build()
         );
-        return minioClient.getPresignedObjectUrl(
-            GetPresignedObjectUrlArgs.builder()
-                .method(Method.GET)
-                .bucket(bucketName)
-                .object(objectName)
-                .expiry(24*60*60)  // 24h
-                .build()
-        );
+        return String.format("%s/buckets/%s/objects/download?preview=true&prefix=%s", minioApiUrl, bucketName, objectName);
     }
 }
