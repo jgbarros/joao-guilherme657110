@@ -3,6 +3,8 @@ package br.gov.mt.seplag.seletivo.joao_guilherme657110_api.security;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.config.JwtUtil;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.security.AuthRequest;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.security.AuthResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Autenticação", description = "Endpoints para autenticação de usuários")
 public class AuthController {
 
     @Autowired
@@ -29,6 +32,7 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/authenticate")
+    @Operation(summary = "Autenticar usuário", description = "Autentica um usuário e retorna um token JWT")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(

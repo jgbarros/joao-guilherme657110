@@ -4,6 +4,8 @@ import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.AlbumRequest;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.AlbumResponse;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.service.AlbumService;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.service.MinioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/albuns")
 @RequiredArgsConstructor
+@Tag(name = "Álbuns", description = "Gerenciamento de Álbuns")
 public class AlbumController {
 
     private final AlbumService service;
@@ -28,6 +31,7 @@ public class AlbumController {
     private String bucketName;
     
     @GetMapping
+    @Operation(summary = "Listar álbuns", description = "Retorna uma lista paginada de álbuns")
     public ResponseEntity<Page<AlbumResponse>> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -37,32 +41,38 @@ public class AlbumController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar álbum por ID", description = "Retorna um álbum específico pelo seu ID")
     public ResponseEntity<AlbumResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @GetMapping("/count")
+    @Operation(summary = "Contar álbuns", description = "Retorna a quantidade total de álbuns cadastrados")
     public ResponseEntity<Long> count() {
         return ResponseEntity.ok(service.count());
     }
 
     @PostMapping
+    @Operation(summary = "Criar álbum", description = "Cria um novo álbum")
     public ResponseEntity<AlbumResponse> create(@Validated @RequestBody AlbumRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(req));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar álbum", description = "Atualiza os dados de um álbum existente")
     public ResponseEntity<AlbumResponse> update(@PathVariable Long id, @Validated @RequestBody AlbumRequest req) {
         return ResponseEntity.ok(service.update(id, req));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deletar álbum", description = "Remove um álbum pelo seu ID")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/upload")
+    @Operation(summary = "Upload da capa do álbum", description = "Faz o upload da imagem de capa para um álbum")
     //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> uploadCapa(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
