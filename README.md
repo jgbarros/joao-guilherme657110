@@ -6,7 +6,7 @@
 
 [![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%204.0.1-brightgreen)] [![Frontend](https://img.shields.io/badge/Frontend-React%2018-blue)] [![DB](https://img.shields.io/badge/DB-PostgreSQL%2016-orange)] [![Object](https://img.shields.io/badge/Object-MinIO-red)]
 
-## 🔧 Status Atual (23/01/2026)
+## 🔧 Status Atual (28/01/2026)
 - ✅ **Infra Docker**: Postgres + MinIO + Backend UP
 - ✅ **Flyway**: Schema + seed data (users, artistas, albuns, regionais)
 - ✅ **JPA**: Entities Artista/Album/Regional/User
@@ -14,7 +14,7 @@
 - ✅ **JWT**: Auth completa com BCrypt + Roles (USER/ADMIN)
 - ✅ **MinIO**: Upload arquivos (capas artistas) com presigned URL
 - ✅ **WebSocket**: Real-time artistas/álbuns (broadcast)
-- ⏳ **Próximo**: Frontend React
+- ✅ **Frontend**: Frontend React
 
 ## 🚀 Como rodar o Docker
 
@@ -31,6 +31,8 @@ docker compose up -d
 | **MinIO Console** | [localhost:9001](http://localhost:9001) | `minioadmin` / `minioadmin` |
 | **MinIO Browser** | [localhost:9001/browser](http://localhost:9001) | `minioadmin` / `minioadmin` |
 | **Backend API** | [localhost:8080/](http://localhost:8080) | `admin` / `admin123` |
+| **Frontend** | [localhost:5173](http://localhost:5173) | `admin` / `admin123` |
+| **Swagger UI** | [localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) |
 
 
 
@@ -44,30 +46,39 @@ Body: {"username":"admin","password":"admin123"}
 Response: {"token":"eyJhbGciOiJIUzUxMiJ9..."}
 ```
 
-
 ### **Artistas** (Protegido ROLE_USER+)
 
 ```
-GET    /api/artistas?page=0&size=10&filtro=Serj
-POST   /api/artistas (cria → dispara WebSocket)
-POST   /api/artistas/upload (multipart file)
-PUT    /api/artistas/{id}
-DELETE /api/artistas/{id}
+GET    /api/artistas               Listar artistas (paginado)
+GET    /api/artistas/{id}           Buscar por ID
+GET    /api/artistas/count          Contar artistas
+POST   /api/artistas                Criar artista (→ WebSocket)
+PUT    /api/artistas/{id}           Atualizar artista
+DELETE /api/artistas/{id}           Deletar artista
 ```
-
 
 ### **Álbuns** (Protegido ROLE_USER+)
 
 ```
-GET    /api/albuns?page=0&size=10&filtro=Serj
-POST   /api/albuns (cria → dispara WebSocket)
-POST   /api/albuns/upload (multipart file)
-PUT    /api/albuns/{id}
-DELETE /api/albuns/{id}
+GET    /api/albuns                  Listar álbuns (paginado)
+GET    /api/albuns/{id}             Buscar por ID
+GET    /api/albuns/count            Contar álbuns
+POST   /api/albuns                  Criar álbum (→ WebSocket)
+PUT    /api/albuns/{id}             Atualizar álbum
+DELETE /api/albuns/{id}             Deletar álbum
+POST   /api/albuns/{id}/upload      Upload capa (MinIO) (Protegido ROLE_ADMIN)
 ```
 
+### **Regionais** (Protegido ROLE_USER+)
 
-## 🌐 **WebSocket Real-Time** (Simples TextWebSocketHandler)
+```
+GET    /api/regionais             Listar regionais
+GET    /api/regionais/{id}        Buscar por ID
+GET    /api/regionais/count       Contar regionais
+GET    /api/regionais/ativas      Listar regionais ativas
+```
+
+## **WebSocket Real-Time** (Simples TextWebSocketHandler)
 
 ### **Endpoints WebSocket:**
 
@@ -133,15 +144,10 @@ User:  username=user,  password=user123  (ROLE_USER)
 ```
 
 
-## 📋 **Próximos Passos Pendentes**
-
+ℹ️ Nota sobre Regionais: A tabela Regionais é alimentada automaticamente na inicialização da aplicação via integração com o WS externo https://integrador-argus-api.geia.vip/v1/regionais. Isso garante dados atualizados do Argus sem intervenção manual (via CommandLineRunner ou @PostConstruct). Logs de inicialização mostram o progresso.
+ℹ **Frontend: ** d) Rate limit: máximo 10 requisições por minuto por usuário na API. 
 ```
-⏳ Frontend React:
-  - Login JWT + Axios interceptor
-  - Listagem paginada + filtros
-  - Upload MinIO drag&drop
-  - WebSocket STOMP/SockJS notificações
-⏳ Deploy: Docker + Kubernetes?
+ - Precisou aumentar para 100 pois fica mais viável para utilização, uma vez que para carregar a página do Dashboard já consome quase as 10 requisições.
 ```
 
 

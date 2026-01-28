@@ -33,31 +33,6 @@ export default function Login() {
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Erro no login:', error);
-      
-      let detail = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
-      let summary = 'Erro no Servidor';
-
-      if (error.response) {
-        // O servidor respondeu com um status fora do range 2xx
-        if (error.response.status === 401 || error.response.status === 403) {
-          summary = 'Falha na Autenticação';
-          detail = 'Usuário ou senha incorretos.';
-        } else if (error.response.status >= 500) {
-          summary = 'Erro no Servidor';
-          detail = 'Servidor indisponível no momento.';
-        }
-      } else if (error.request) {
-        // A requisição foi feita mas não houve resposta
-        summary = 'Erro de Conexão';
-        detail = 'Não foi possível conectar ao servidor.';
-      }
-
-      toast.current?.show({
-        severity: 'error',
-        summary: summary,
-        detail: detail,
-        life: 5000
-      });
     } finally {
       setLoading(false);
     }
