@@ -9,6 +9,7 @@ import { Toast } from 'primereact/toast';
 import { Dialog } from 'primereact/dialog';
 import api from '../api/axios';
 import ArtistForm from './ArtistForm';
+import ArtistDetail from './ArtistDetail';
 
 interface Artista {
   id: number;
@@ -60,6 +61,7 @@ export default function ArtistList() {
     totalPages: 0
   });
   const [dialogVisible, setDialogVisible] = useState(false);
+  const [detailDialogVisible, setDetailDialogVisible] = useState(false);
   const [selectedArtistId, setSelectedArtistId] = useState<number | null>(null);
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
@@ -128,18 +130,31 @@ export default function ArtistList() {
     navigate('/dashboard');
   };
 
+  const handleOpenDetail = (id: number) => {
+    setSelectedArtistId(id);
+    setDetailDialogVisible(true);
+  };
+
   const actionBodyTemplate = (rowData: Artista) => {
     return (
       <div className="flex gap-2">
         <Button 
+          icon="pi pi-eye" 
+          className="p-button-rounded p-button-info p-button-text" 
+          onClick={() => handleOpenDetail(rowData.id)}
+          tooltip="Visualizar Detalhes"
+        />
+        <Button 
           icon="pi pi-pencil" 
           className="p-button-rounded p-button-success p-button-text" 
           onClick={() => handleOpenForm(rowData.id)}
+          tooltip="Editar"
         />
         <Button 
           icon="pi pi-trash" 
           className="p-button-rounded p-button-danger p-button-text" 
           onClick={() => handleDelete(rowData.id)}
+          tooltip="Excluir"
         />
       </div>
     );
@@ -238,6 +253,16 @@ export default function ArtistList() {
           onSuccess={handleFormSuccess} 
           onCancel={() => setDialogVisible(false)}
         />
+      </Dialog>
+
+      <Dialog 
+        header="Detalhes do Artista"
+        visible={detailDialogVisible} 
+        style={{ width: '70vw' }} 
+        onHide={() => setDetailDialogVisible(false)}
+        maximizable
+      >
+        {selectedArtistId && <ArtistDetail artistId={selectedArtistId} />}
       </Dialog>
     </div>
   );
