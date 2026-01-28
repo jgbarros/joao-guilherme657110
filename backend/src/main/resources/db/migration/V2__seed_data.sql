@@ -1,6 +1,6 @@
 -- Regionais (simule sync inicial; integre API depois)
-INSERT INTO regionais (nome, ativo) VALUES 
-('Cuiabá', true), ('Várzea Grande', true);
+INSERT INTO regionais (nome, ativo) VALUES
+('NÃO SE APLICA - ACADEPOL', true), ('NÃO SE APLICA - CORREGEPOL', true);
 
 -- Artistas e álbuns exemplos
 INSERT INTO artistas (nome, nacionalidade, data_nascimento, biografia) VALUES 

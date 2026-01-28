@@ -1,5 +1,6 @@
 package br.gov.mt.seplag.seletivo.joao_guilherme657110_api.service;
 
+import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.RegionalExternalDto;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.RegionalRequest;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.RegionalResponse;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.entity.Regional;
@@ -11,7 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,25 +53,20 @@ public class RegionalService {
         return repository.count();
     }
 
-    public RegionalResponse create(RegionalRequest request) {
-        Regional regional = new Regional();
-        updateEntity(regional, request);
-        return mapper.toResponse(repository.save(regional));
-    }
+    public void syncFromExternalApi() {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://integrador-argus-api.geia.vip/v1/regionais";
+        RegionalExternalDto[] externalRegionais = restTemplate.getForObject(url, RegionalExternalDto[].class);
 
-    public RegionalResponse update(Long id, RegionalRequest request) {
-        Regional regional = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Regional não encontrada"));
-        updateEntity(regional, request);
-        return mapper.toResponse(repository.save(regional));
-    }
-
-    public void delete(Long id) {
-        repository.deleteById(id);
-    }
-
-    private void updateEntity(Regional regional, RegionalRequest req) {
-        regional.setNome(req.getNome());
-        regional.setAtivo(req.getAtivo());
+        if (externalRegionais != null) {
+            for (RegionalExternalDto dto : externalRegionais) {
+                Regional regional = repository.findById(dto.getId())
+                        .orElse(new Regional());
+                regional.setId(dto.getId());
+                regional.setNome(dto.getNome());
+                regional.setAtivo(true);
+                repository.save(regional);
+            }
+        }
     }
 }
