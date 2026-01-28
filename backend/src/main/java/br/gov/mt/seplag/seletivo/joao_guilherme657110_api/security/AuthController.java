@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Autenticação", description = "Endpoints para autenticação de usuários")
@@ -39,9 +41,22 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
             String jwt = jwtUtil.generateToken(authentication);
-            return ResponseEntity.ok(new AuthResponse(jwt));
+            String refreshToken = jwtUtil.generateRefreshToken(authentication);
+            return ResponseEntity.ok(new AuthResponse(jwt, refreshToken));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(401).body("Credenciais inválidas");
         }
+    }
+
+    @PostMapping("/refresh")
+    @Operation(summary = "Renovar token", description = "Renova o token JWT usando um refresh token válido")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+        if (refreshToken != null && jwtUtil.validateToken(refreshToken)) {
+            String username = jwtUtil.extractUsername(refreshToken);
+            String newJwt = jwtUtil.generateTokenFromUsername(username);
+            return ResponseEntity.ok(new AuthResponse(newJwt, refreshToken));
+        }
+        return ResponseEntity.status(401).body("Refresh token inválido ou expirado");
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,7 +74,7 @@ public class AlbumController {
 
     @PostMapping("/{id}/upload")
     @Operation(summary = "Upload da capa do álbum", description = "Faz o upload da imagem de capa para um álbum")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> uploadCapa(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
             String url = minioService.uploadFile(file, bucketName, "albuns/" + id + "/" + file.getOriginalFilename());
