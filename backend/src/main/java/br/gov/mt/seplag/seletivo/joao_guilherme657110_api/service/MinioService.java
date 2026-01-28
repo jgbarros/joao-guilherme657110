@@ -4,6 +4,7 @@ import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.SetBucketPolicyArgs;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +18,11 @@ public class MinioService {
     @Value("${minio.bucket}")
     private String bucketName;
 
-    @Value("${minio.api-url}")
-    private String minioApiUrl;
+    @Value("${minio.url}")
+    private String minioUrl;
+
+    @Value("${minio.public-url:#{null}}")
+    private String minioPublicUrl;
 
     @PostConstruct
     public void initBucket() {
@@ -31,6 +35,29 @@ public class MinioService {
                     MakeBucketArgs.builder().bucket(bucketName).build()
                 );
             }
+
+            // Define política pública para leitura
+            String policy = "{\n" +
+                    "    \"Version\": \"2012-10-17\",\n" +
+                    "    \"Statement\": [\n" +
+                    "        {\n" +
+                    "            \"Effect\": \"Allow\",\n" +
+                    "            \"Principal\": {\"AWS\": [\"*\"]},\n" +
+                    "            \"Action\": [\"s3:GetBucketLocation\", \"s3:ListBucket\"],\n" +
+                    "            \"Resource\": [\"arn:aws:s3:::" + bucketName + "\"]\n" +
+                    "        },\n" +
+                    "        {\n" +
+                    "            \"Effect\": \"Allow\",\n" +
+                    "            \"Principal\": {\"AWS\": [\"*\"]},\n" +
+                    "            \"Action\": [\"s3:GetObject\"],\n" +
+                    "            \"Resource\": [\"arn:aws:s3:::" + bucketName + "/*\"]\n" +
+                    "        }\n" +
+                    "    ]\n" +
+                    "}";
+            
+            minioClient.setBucketPolicy(
+                SetBucketPolicyArgs.builder().bucket(bucketName).config(policy).build()
+            );
         } catch (Exception e) {
             // Logar o erro mas não impedir a inicialização da aplicação
             System.err.println("Erro ao inicializar bucket MinIO: " + e.getMessage());
@@ -46,6 +73,7 @@ public class MinioService {
                 .contentType(file.getContentType())
                 .build()
         );
-        return String.format("%s/buckets/%s/objects/download?preview=true&prefix=%s", minioApiUrl, bucketName, objectName);
+        String baseUrl = (minioPublicUrl != null && !minioPublicUrl.isBlank()) ? minioPublicUrl : minioUrl;
+        return String.format("%s/%s/%s", baseUrl, bucketName, objectName);
     }
 }
