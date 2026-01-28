@@ -1,6 +1,7 @@
 package br.gov.mt.seplag.seletivo.joao_guilherme657110_api.service;
 
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.config.handler.ArtistaWebSocketHandler;
+import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.ArtistaDetalheResponse;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.ws.ArtistaNotification;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.mapper.ArtistaMapper;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.ArtistaRequest;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +44,25 @@ public class ArtistaService {
         Artista artista = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Artista não encontrado"));
         return mapper.toResponse(artista);
+    }
+
+    public ArtistaDetalheResponse findDetalheById(Long id) {
+        Artista artista = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Artista não encontrado"));
+        
+        return ArtistaDetalheResponse.builder()
+                .id(artista.getId())
+                .nome(artista.getNome())
+                .nacionalidade(artista.getNacionalidade())
+                .albuns(artista.getAlbuns().stream()
+                        .map(album -> ArtistaDetalheResponse.AlbumSummary.builder()
+                                .id(album.getId())
+                                .titulo(album.getTitulo())
+                                .anoLancamento(album.getAnoLancamento())
+                                .capaUrl(album.getCapaUrl())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     public long count() {

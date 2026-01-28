@@ -1,5 +1,6 @@
 package br.gov.mt.seplag.seletivo.joao_guilherme657110_api.controller;
 
+import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.ArtistaDetalheResponse;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.ArtistaRequest;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.ArtistaResponse;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.service.ArtistaService;
@@ -37,6 +38,12 @@ public class ArtistaController {
     @Operation(summary = "Buscar artista por ID", description = "Retorna um artista específico pelo seu ID")
     public ResponseEntity<ArtistaResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
+    }
+
+    @GetMapping("/{id}/detalhe")
+    @Operation(summary = "Buscar detalhes do artista", description = "Retorna um artista com a lista de seus álbuns")
+    public ResponseEntity<ArtistaDetalheResponse> findDetalheById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findDetalheById(id));
     }
 
     @GetMapping("/count")
