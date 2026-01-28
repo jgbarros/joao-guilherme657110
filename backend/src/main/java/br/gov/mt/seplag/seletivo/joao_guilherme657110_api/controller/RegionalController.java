@@ -1,6 +1,5 @@
 package br.gov.mt.seplag.seletivo.joao_guilherme657110_api.controller;
 
-import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.RegionalRequest;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.dto.RegionalResponse;
 import br.gov.mt.seplag.seletivo.joao_guilherme657110_api.service.RegionalService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,9 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,24 +48,5 @@ public class RegionalController {
     @Operation(summary = "Contar regionais", description = "Retorna a quantidade total de regionais cadastradas")
     public ResponseEntity<Long> count() {
         return ResponseEntity.ok(service.count());
-    }
-
-    @PostMapping
-    @Operation(summary = "Criar regional", description = "Cria uma nova regional")
-    public ResponseEntity<RegionalResponse> create(@Validated @RequestBody RegionalRequest req) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(req));
-    }
-
-    @PutMapping("/{id}")
-    @Operation(summary = "Atualizar regional", description = "Atualiza os dados de uma regional existente")
-    public ResponseEntity<RegionalResponse> update(@PathVariable Long id, @Validated @RequestBody RegionalRequest req) {
-        return ResponseEntity.ok(service.update(id, req));
-    }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Deletar regional", description = "Remove uma regional pelo seu ID")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
     }
 }
