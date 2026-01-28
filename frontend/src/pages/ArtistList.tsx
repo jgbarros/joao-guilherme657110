@@ -84,9 +84,6 @@ export default function ArtistList() {
     } catch (err: any) {
       console.error('Erro ao buscar artistas:', err);
       setError('Erro ao carregar artistas. Verifique se o backend está rodando.');
-      if (toast.current) {
-        toast.current.show({ severity: 'error', summary: 'Erro', detail: 'Não foi possível carregar os artistas.' });
-      }
     } finally {
       setLoading(false);
     }
@@ -107,12 +104,6 @@ export default function ArtistList() {
           fetchArtistas(pagination.page, pagination.size);
         } catch (error: any) {
           console.error('Erro ao excluir artista:', error);
-          const errorMessage = error.response?.data?.message || error.response?.data || 'Não foi possível excluir o artista.';
-          toast.current?.show({ 
-            severity: 'error', 
-            summary: 'Erro', 
-            detail: typeof errorMessage === 'string' ? errorMessage : 'Erro ao excluir o artista.' 
-          });
         }
       }
     });

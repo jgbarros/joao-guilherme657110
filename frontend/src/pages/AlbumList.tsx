@@ -73,9 +73,6 @@ export default function AlbumList() {
     } catch (err: any) {
       console.error('Erro ao buscar álbuns:', err);
       setError('Erro ao carregar álbuns. Verifique se o backend está rodando.');
-      if (toast.current) {
-        toast.current.show({ severity: 'error', summary: 'Erro', detail: 'Não foi possível carregar os álbuns.' });
-      }
     } finally {
       setLoading(false);
     }
@@ -96,12 +93,6 @@ export default function AlbumList() {
           fetchAlbuns(pagination.page, pagination.size);
         } catch (error: any) {
           console.error('Erro ao excluir álbum:', error);
-          const errorMessage = error.response?.data?.message || error.response?.data || 'Não foi possível excluir o álbum.';
-          toast.current?.show({ 
-            severity: 'error', 
-            summary: 'Erro', 
-            detail: typeof errorMessage === 'string' ? errorMessage : 'Erro ao excluir o álbum.' 
-          });
         }
       }
     });

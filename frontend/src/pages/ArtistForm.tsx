@@ -112,12 +112,6 @@ export default function ArtistForm({ artistId, onSuccess, onCancel }: ArtistaFor
       }, 1000);
     } catch (error: any) {
       console.error('Erro ao salvar artista:', error);
-      const errorMessage = error.response?.data?.message || error.response?.data || 'Ocorreu um erro ao salvar o artista.';
-      toast.current?.show({ 
-        severity: 'error', 
-        summary: 'Erro', 
-        detail: typeof errorMessage === 'string' ? errorMessage : 'Erro na validação dos dados.' 
-      });
       setLoading(false);
     }
   };

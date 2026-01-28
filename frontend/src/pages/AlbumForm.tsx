@@ -122,6 +122,23 @@ export default function AlbumForm({ albumId, onSuccess, onCancel }: AlbumFormPro
     toast.current?.show({ severity: 'success', summary: 'Sucesso', detail: 'Capa enviada com sucesso!' });
   };
 
+  const onUploadError = async (e: any) => {
+    console.error('Erro no upload:', e);
+    let errorMessage = 'Falha ao enviar o arquivo. Verifique suas permissões.';
+    
+    if (e.xhr && e.xhr.response) {
+      try {
+        const responseData = JSON.parse(e.xhr.response);
+        errorMessage = responseData.message || responseData.data || responseData;
+      } catch (err) {
+        errorMessage = e.xhr.response;
+      }
+    }
+    
+    const { showToast } = await import('../utils/toastService');
+    showToast('error', 'Erro no Upload', typeof errorMessage === 'string' ? errorMessage : 'Falha no upload.');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -145,12 +162,6 @@ export default function AlbumForm({ albumId, onSuccess, onCancel }: AlbumFormPro
       }, 1000);
     } catch (error: any) {
       console.error('Erro ao salvar álbum:', error);
-      const errorMessage = error.response?.data?.message || error.response?.data || 'Ocorreu um erro ao salvar o álbum.';
-      toast.current?.show({ 
-        severity: 'error', 
-        summary: 'Erro', 
-        detail: typeof errorMessage === 'string' ? errorMessage : 'Erro na validação dos dados.' 
-      });
       setLoading(false);
     }
   };
@@ -232,6 +243,7 @@ export default function AlbumForm({ albumId, onSuccess, onCancel }: AlbumFormPro
                 accept="image/*" 
                 maxFileSize={1000000} 
                 onUpload={onUpload} 
+                onError={onUploadError}
                 auto 
                 chooseLabel="Fazer Upload da Capa" 
                 onBeforeSend={(e) => {
