@@ -22,7 +22,10 @@ public class JwtUtil {
     private String secret;
 
     @Value("${security.jwt.expiration}")
-    private int expiration; // ms, ex: 24h = 86400000
+    private int expiration; // ms
+
+    @Value("${security.jwt.refresh-expiration}")
+    private int refreshExpiration; // ms
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
@@ -30,14 +33,23 @@ public class JwtUtil {
 
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
-        return createToken(username);
+        return createToken(username, expiration);
     }
 
-    private String createToken(String username) {
+    public String generateRefreshToken(Authentication authentication) {
+        String username = authentication.getName();
+        return createToken(username, refreshExpiration);
+    }
+    
+    public String generateTokenFromUsername(String username) {
+        return createToken(username, expiration);
+    }
+
+    private String createToken(String username, int expirationTime) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -45,6 +57,10 @@ public class JwtUtil {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+    
+    public Boolean validateToken(String token) {
+        return !isTokenExpired(token);
     }
 
     public String extractUsername(String token) {
