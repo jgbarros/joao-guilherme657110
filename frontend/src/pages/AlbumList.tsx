@@ -8,35 +8,9 @@ import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { Dialog } from 'primereact/dialog';
 import { Image } from 'primereact/image';
-import api from '../api/axios';
+import AlbumFacade from '../facades/AlbumFacade';
+import type { Album } from '../facades/AlbumFacade';
 import AlbumForm from './AlbumForm';
-
-interface Album {
-  id: number;
-  titulo: string;
-  anoLancamento: number;
-  genero: string;
-  capaUrl: string;
-  faixas: string;
-  artistaId: number;
-  artistaNome: string;
-  regionalId: number;
-  regionalNome: string;
-}
-
-interface PaginatedResponse {
-  content: Album[];
-  empty: boolean;
-  first: boolean;
-  last: boolean;
-  number: number;
-  numberOfElements: number;
-  pageable: any;
-  size: number;
-  sort: any;
-  totalElements: number;
-  totalPages: number;
-}
 
 export default function AlbumList() {
   const [albuns, setAlbuns] = useState<Album[]>([]);
@@ -54,27 +28,26 @@ export default function AlbumList() {
   const toast = useRef<Toast>(null);
 
   useEffect(() => {
-    fetchAlbuns(pagination.page, pagination.size);
+    const subAlbums = AlbumFacade.albums$.subscribe(setAlbuns);
+    const subLoading = AlbumFacade.loading$.subscribe(setLoading);
+    const subPagination = AlbumFacade.pagination$.subscribe(setPagination);
+
+    AlbumFacade.fetchAlbums(pagination.page, pagination.size);
+
+    return () => {
+      subAlbums.unsubscribe();
+      subLoading.unsubscribe();
+      subPagination.unsubscribe();
+    };
   }, []);
 
   const fetchAlbuns = async (page: number = 0, size: number = 10) => {
-    setLoading(true);
     try {
-      const response = await api.get(`/api/albuns?page=${page}&size=${size}`);
-      const data: PaginatedResponse = response.data;
-      setAlbuns(data.content);
-      setPagination({
-        page: data.number,
-        size: data.size,
-        totalElements: data.totalElements,
-        totalPages: data.totalPages
-      });
+      await AlbumFacade.fetchAlbums(page, size);
       setError(null);
     } catch (err: any) {
       console.error('Erro ao buscar álbuns:', err);
       setError('Erro ao carregar álbuns. Verifique se o backend está rodando.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -88,11 +61,11 @@ export default function AlbumList() {
       rejectLabel: 'Cancelar',
       accept: async () => {
         try {
-          await api.delete(`/api/albuns/${id}`);
+          await AlbumFacade.deleteAlbum(id);
           toast.current?.show({ severity: 'success', summary: 'Sucesso', detail: 'Álbum excluído com sucesso!' });
-          fetchAlbuns(pagination.page, pagination.size);
         } catch (error: any) {
           console.error('Erro ao excluir álbum:', error);
+          toast.current?.show({ severity: 'error', summary: 'Erro', detail: 'Erro ao excluir álbum.' });
         }
       }
     });

@@ -5,6 +5,8 @@ import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { FileUpload } from 'primereact/fileupload';
+import AlbumFacade from '../facades/AlbumFacade';
+import ArtistFacade from '../facades/ArtistFacade';
 import api from '../api/axios';
 
 interface AlbumFormProps {
@@ -54,15 +56,12 @@ export default function AlbumForm({ albumId, onSuccess, onCancel }: AlbumFormPro
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [artistasRes, regionaisRes] = await Promise.all([
-          api.get('/api/artistas?size=1000'),
-          api.get('/api/regionais/ativas') // Mudado para carregar apenas regionais ativas (retorna lista diretamente)
-        ]);
+        // Carrega artistas usando o facade (mesmo que pegue apenas os da página atual, idealmente teríamos um getAll)
+        // Como o facade já tem suporte a paginação, vamos usar um tamanho grande para o dropdown
+        await ArtistFacade.fetchArtists(0, 1000);
         
-        const artistasList = artistasRes.data?.content || (Array.isArray(artistasRes.data) ? artistasRes.data : []);
+        const regionaisRes = await api.get('/api/regionais/ativas');
         const regionaisList = Array.isArray(regionaisRes.data) ? regionaisRes.data : (regionaisRes.data?.content || []);
-        
-        setArtistas(artistasList);
         setRegionais(regionaisList);
       } catch (error) {
         console.error('Erro ao buscar artistas ou regionais:', error);
@@ -71,6 +70,9 @@ export default function AlbumForm({ albumId, onSuccess, onCancel }: AlbumFormPro
     };
 
     fetchData();
+
+    const subArtists = ArtistFacade.artists$.subscribe(setArtistas);
+    return () => subArtists.unsubscribe();
   }, []);
 
   // UseEffect para carregar dados do álbum ou resetar o formulário quando albumId mudar
@@ -79,8 +81,8 @@ export default function AlbumForm({ albumId, onSuccess, onCancel }: AlbumFormPro
       const fetchAlbum = async () => {
         setLoading(true);
         try {
-          const response = await api.get(`/api/albuns/${albumId}`);
-          const { titulo, artistaId, anoLancamento, genero, capaUrl, faixas, regionalId } = response.data;
+          const data = await AlbumFacade.getAlbumById(albumId);
+          const { titulo, artistaId, anoLancamento, genero, capaUrl, faixas, regionalId } = data;
           setFormData({
             titulo,
             artistaId,
@@ -150,13 +152,15 @@ export default function AlbumForm({ albumId, onSuccess, onCancel }: AlbumFormPro
     }
 
     try {
-      if (isEditMode && albumId) {
-        await api.put(`/api/albuns/${albumId}`, formData);
-        toast.current?.show({ severity: 'success', summary: 'Sucesso', detail: 'Álbum atualizado com sucesso!' });
-      } else {
-        await api.post('/api/albuns', formData);
-        toast.current?.show({ severity: 'success', summary: 'Sucesso', detail: 'Álbum criado com sucesso!' });
-      }
+      const payload = { ...formData, id: albumId || undefined };
+      await AlbumFacade.saveAlbum(payload);
+      
+      toast.current?.show({ 
+        severity: 'success', 
+        summary: 'Sucesso', 
+        detail: isEditMode ? 'Álbum atualizado com sucesso!' : 'Álbum criado com sucesso!' 
+      });
+
       setTimeout(() => {
         onSuccess();
       }, 1000);

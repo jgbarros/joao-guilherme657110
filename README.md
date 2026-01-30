@@ -6,7 +6,7 @@
 
 [![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%204.0.1-brightgreen)] [![Frontend](https://img.shields.io/badge/Frontend-React%2018-blue)] [![DB](https://img.shields.io/badge/DB-PostgreSQL%2016-orange)] [![Object](https://img.shields.io/badge/Object-MinIO-red)]
 
-## 🔧 Status Atual (28/01/2026)
+## 🔧 Status Atual (30/01/2026)
 - ✅ **Infra Docker**: Postgres + MinIO + Backend UP
 - ✅ **Flyway**: Schema + seed data (users, artistas, albuns, regionais)
 - ✅ **JPA**: Entities Artista/Album/Regional/User
@@ -144,10 +144,20 @@ User:  username=user,  password=user123  (ROLE_USER)
 ```
 
 
-ℹ️ Nota sobre Regionais: A tabela Regionais é alimentada automaticamente na inicialização da aplicação via integração com o WS externo https://integrador-argus-api.geia.vip/v1/regionais. Isso garante dados atualizados do Argus sem intervenção manual (via CommandLineRunner ou @PostConstruct). Logs de inicialização mostram o progresso.
-ℹ **Frontend: ** d) Rate limit: máximo 10 requisições por minuto por usuário na API. 
+## ⚠️ **Observações Importantes**
+
+ℹ️ Nota sobre Regionais: A tabela Regionais é alimentada automaticamente na inicialização da aplicação via integração com o WS externo https://integrador-argus-api.geia.vip/v1/regionais. Isso garante dados atualizados sem intervenção manual (via CommandLineRunner ou @PostConstruct). Logs de inicialização mostram o progresso.
+
+➖ d) Rate limit: máximo 10 requisições por minuto por usuário na API. 
 ```
  - Precisou aumentar para 100 pois fica mais viável para utilização, uma vez que para carregar a página do Dashboard já consome quase as 10 requisições.
+```
+
+ℹ️ MinIO pré-assinados (presigned URL)
+
+➖ i) Recuperar imagens via links pré-assinados (presigned URL) com expiração de 30 minutos
+```
+ - Apresentou o erro SignatureDoesNotMatch. A URL foi gerada internamente para o Docker (minio:9000) foi assinada, mas a URL externa (localhost:9001) não estava com a mesma assinatura. Não foi possível implementar o reverse proxy para resolver o problema sem comprometer a entrega da solução já implementada.
 ```
 
 

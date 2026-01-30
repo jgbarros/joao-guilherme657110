@@ -4,16 +4,18 @@ import { Divider } from "primereact/divider";
 import { useNavigate } from 'react-router-dom';
 import StatCard from "../components/StatCard.tsx";
 import { useEffect, useState } from 'react';
-import api from '../api/axios';
-import RegionalApiService from '../services/RegionalApiService';
+import DashboardFacade from '../facades/DashboardFacade';
+import type { DashboardStats } from '../facades/DashboardFacade';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
-  const [totalArtistas, setTotalArtistas] = useState(0);
-  const [totalAlbuns, setTotalAlbuns] = useState(0);
-  const [totalRegionais, setTotalRegionais] = useState(0);
-  const [totalRegionaisApi, setTotalRegionaisApi] = useState(0);
+  const [stats, setStats] = useState<DashboardStats>({
+    totalArtistas: 0,
+    totalAlbuns: 0,
+    totalRegionais: 0,
+    totalRegionaisApi: 0
+  });
 
   useEffect(() => {
     if (!token) {
@@ -22,25 +24,12 @@ export default function Dashboard() {
   }, [token, navigate]);
 
   useEffect(() => {
-    const fetchCounts = async () => {
-      if (!token) return;
-      try {
-        const [artistasRes, albunsRes, regionaisRes, totalApi] = await Promise.all([
-          api.get('/api/artistas/count'),
-          api.get('/api/albuns/count'),
-          api.get('/api/regionais/count'),
-          RegionalApiService.count()
-        ]);
-        setTotalArtistas(artistasRes.data);
-        setTotalAlbuns(albunsRes.data);
-        setTotalRegionais(regionaisRes.data);
-        setTotalRegionaisApi(totalApi);
-      } catch (error) {
-        console.error('Erro ao buscar totais:', error);
-      }
-    };
+    if (!token) return;
 
-    fetchCounts();
+    const subscription = DashboardFacade.stats$.subscribe(setStats);
+    DashboardFacade.fetchStats();
+
+    return () => subscription.unsubscribe();
   }, [token]);
 
   const handleLogout = () => {
@@ -61,10 +50,10 @@ export default function Dashboard() {
                   </div>
 
                   <div className="flex flex-column md:flex-row align-items-start gap-4 p-2 w-full max-w-6xl mx-auto">
-                      <StatCard title="Artistas" value={totalArtistas} icon="pi-users" color="#3b82f6"/>
-                      <StatCard title="Álbuns" value={totalAlbuns} icon="pi-folder" color="#22c55e"/>
-                      <StatCard title="Regionais (Local)" value={totalRegionais} icon="pi-map-marker" color="#e67e22"/>
-                      <StatCard title="Regionais (Api)" value={totalRegionaisApi} icon="pi-map-marker" color="#c0392b"/>
+                      <StatCard title="Artistas" value={stats.totalArtistas} icon="pi-users" color="#3b82f6"/>
+                      <StatCard title="Álbuns" value={stats.totalAlbuns} icon="pi-folder" color="#22c55e"/>
+                      <StatCard title="Regionais (Local)" value={stats.totalRegionais} icon="pi-map-marker" color="#e67e22"/>
+                      <StatCard title="Regionais (Api)" value={stats.totalRegionaisApi} icon="pi-map-marker" color="#c0392b"/>
 
                       <div className="col-12 md:col-4">
                           <Card title={<><i className="pi pi-bolt mr-2"/>Ações Rápidas</>}>

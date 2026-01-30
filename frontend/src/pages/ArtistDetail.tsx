@@ -3,7 +3,7 @@ import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Image } from 'primereact/image';
-import api from '../api/axios';
+import ArtistFacade from '../facades/ArtistFacade';
 
 interface AlbumSummary {
     id: number;
@@ -32,8 +32,8 @@ export default function ArtistDetail({ artistId }: ArtistDetailProps) {
         const fetchArtistDetail = async () => {
             setLoading(true);
             try {
-                const response = await api.get(`/api/artistas/${artistId}/detalhe`);
-                setArtista(response.data);
+                const data = await ArtistFacade.getArtistDetail(artistId);
+                setArtista(data);
                 setError(null);
             } catch (err: any) {
                 console.error('Erro ao buscar detalhes do artista:', err);
