@@ -4,7 +4,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import api from '../api/axios';
+import ArtistFacade from '../facades/ArtistFacade';
 
 interface ArtistaFormProps {
   artistId: number | null;
@@ -38,8 +38,8 @@ export default function ArtistForm({ artistId, onSuccess, onCancel }: ArtistaFor
       const fetchArtist = async () => {
         setLoading(true);
         try {
-          const response = await api.get(`/api/artistas/${artistId}`);
-          const { nome, biografia, nacionalidade, dataNascimento, dataMorte } = response.data;
+          const data = await ArtistFacade.getArtistById(artistId);
+          const { nome, biografia, nacionalidade, dataNascimento, dataMorte } = data;
           setFormData({
             nome,
             biografia: biografia || '',
@@ -94,18 +94,18 @@ export default function ArtistForm({ artistId, onSuccess, onCancel }: ArtistaFor
 
     const payload = {
       ...formData,
+      id: artistId || undefined,
       dataNascimento: formData.dataNascimento ? formData.dataNascimento.toISOString().split('T')[0] : null,
       dataMorte: formData.dataMorte ? formData.dataMorte.toISOString().split('T')[0] : null,
     };
 
     try {
-      if (isEditMode && artistId) {
-        await api.put(`/api/artistas/${artistId}`, payload);
-        toast.current?.show({ severity: 'success', summary: 'Sucesso', detail: 'Artista atualizado com sucesso!' });
-      } else {
-        await api.post('/api/artistas', payload);
-        toast.current?.show({ severity: 'success', summary: 'Sucesso', detail: 'Artista criado com sucesso!' });
-      }
+      await ArtistFacade.saveArtist(payload);
+      toast.current?.show({ 
+        severity: 'success', 
+        summary: 'Sucesso', 
+        detail: isEditMode ? 'Artista atualizado com sucesso!' : 'Artista criado com sucesso!' 
+      });
       // Aguarda um pouco para mostrar o toast antes de fechar
       setTimeout(() => {
         onSuccess();

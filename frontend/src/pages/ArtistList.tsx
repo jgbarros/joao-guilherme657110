@@ -7,48 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { Dialog } from 'primereact/dialog';
-import api from '../api/axios';
+import ArtistFacade from '../facades/ArtistFacade';
+import type { Artista } from '../facades/ArtistFacade';
 import ArtistForm from './ArtistForm';
 import ArtistDetail from './ArtistDetail';
-
-interface Artista {
-  id: number;
-  nome: string;
-  biografia?: string;
-  dataNascimento?: string;
-  dataMorte?: string;
-  nacionalidade?: string;
-  albumCount?: number;
-}
-
-interface PaginatedResponse {
-  content: Artista[];
-  empty: boolean;
-  first: boolean;
-  last: boolean;
-  number: number;
-  numberOfElements: number;
-  pageable: {
-    offset: number;
-    pageNumber: number;
-    pageSize: number;
-    paged: boolean;
-    sort: {
-      empty: boolean;
-      sorted: boolean;
-      unsorted: boolean;
-    };
-    unpaged: boolean;
-  };
-  size: number;
-  sort: {
-    empty: boolean;
-    sorted: boolean;
-    unsorted: boolean;
-  };
-  totalElements: number;
-  totalPages: number;
-}
 
 export default function ArtistList() {
   const [artistas, setArtistas] = useState<Artista[]>([]);
@@ -67,27 +29,26 @@ export default function ArtistList() {
   const toast = useRef<Toast>(null);
 
   useEffect(() => {
-    fetchArtistas(pagination.page, pagination.size);
+    const subArtists = ArtistFacade.artists$.subscribe(setArtistas);
+    const subLoading = ArtistFacade.loading$.subscribe(setLoading);
+    const subPagination = ArtistFacade.pagination$.subscribe(setPagination);
+
+    ArtistFacade.fetchArtists(pagination.page, pagination.size);
+
+    return () => {
+      subArtists.unsubscribe();
+      subLoading.unsubscribe();
+      subPagination.unsubscribe();
+    };
   }, []);
 
   const fetchArtistas = async (page: number = 0, size: number = 10) => {
-    setLoading(true);
     try {
-      const response = await api.get(`/api/artistas?page=${page}&size=${size}`);
-      const data: PaginatedResponse = response.data;
-      setArtistas(data.content);
-      setPagination({
-        page: data.number,
-        size: data.size,
-        totalElements: data.totalElements,
-        totalPages: data.totalPages
-      });
+      await ArtistFacade.fetchArtists(page, size);
       setError(null);
     } catch (err: any) {
       console.error('Erro ao buscar artistas:', err);
       setError('Erro ao carregar artistas. Verifique se o backend está rodando.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -101,11 +62,11 @@ export default function ArtistList() {
       rejectLabel: 'Cancelar',
       accept: async () => {
         try {
-          await api.delete(`/api/artistas/${id}`);
+          await ArtistFacade.deleteArtist(id);
           toast.current?.show({ severity: 'success', summary: 'Sucesso', detail: 'Artista excluído com sucesso!' });
-          fetchArtistas(pagination.page, pagination.size);
         } catch (error: any) {
           console.error('Erro ao excluir artista:', error);
+          toast.current?.show({ severity: 'error', summary: 'Erro', detail: 'Erro ao excluir artista.' });
         }
       }
     });
