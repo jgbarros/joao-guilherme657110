@@ -24,6 +24,15 @@ cd joao-guilherme657110
 docker compose up -d
 ```
 
+## 🚀 Como rodar o Frontend
+
+```bash
+Abra o VSCode
+Selecione o diretório: /frontend
+npm i
+npm run dev
+```
+
 ### Serviços
 | Serviço | URL | Credenciais |
 |---------|-----|-------------|
