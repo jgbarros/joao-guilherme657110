@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toast } from 'primereact/toast'
 import { toastRef } from './utils/toastService'
+import ErrorLockDialog from './components/ErrorLockDialog'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import ArtistList from './pages/ArtistList'
@@ -10,6 +11,7 @@ function App() {
   return (
     <BrowserRouter>
       <Toast ref={toastRef} />
+      <ErrorLockDialog />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />

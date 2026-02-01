@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { showToast } from '../utils/toastService';
+import { lockScreen } from '../utils/errorLockService';
 
 const api = axios.create({
   baseURL: 'http://localhost:8080',
@@ -31,6 +31,7 @@ api.interceptors.response.use(
     const isAuthRoute = error.config?.url?.includes('/api/auth/authenticate');
     
     if (status === 401 && !isAuthRoute) {
+      // 401 fora do login: sessão expirada ou inválida -> força logout imediato
       localStorage.removeItem('token');
       window.location.href = '/';
       return Promise.reject(error);
@@ -51,19 +52,20 @@ api.interceptors.response.use(
       }
 
       if (status === 429) {
-        showToast('error', 'Limite Excedido', message || 'Muitas requisições. Tente novamente mais tarde.');
+        lockScreen('Limite Excedido', message || 'Muitas requisições. Tente novamente mais tarde.');
       } else if (status === 403) {
-        showToast('error', 'Acesso Negado', message || 'Você não tem permissão para realizar esta ação.');
+        lockScreen('Acesso Negado', message || 'Você não tem permissão para realizar esta ação.');
       } else if (isAuthRoute && (status === 401 || status === 403)) {
-        showToast('error', 'Falha na Autenticação', 'Usuário ou senha incorretos.');
+        // Mantem o comportamento padrão na tela de Login
+        lockScreen('Falha na Autenticação', 'Usuário ou senha incorretos.');
       } else if (status >= 500) {
-        showToast('error', 'Erro no Servidor', 'Ocorreu um erro no servidor. Tente novamente mais tarde.');
+        lockScreen('Erro no Servidor', 'Ocorreu um erro no servidor. Tente novamente mais tarde.');
       } else if (status >= 400 && !isAuthRoute) {
          // Para outros erros 4xx que não sejam auth
-         showToast('error', 'Erro', message || 'Ocorreu um erro inesperado.');
+         lockScreen('Erro', message || 'Ocorreu um erro inesperado.');
       }
     } else if (error.message === 'Network Error') {
-      showToast('error', 'Erro de Rede', 'Não foi possível conectar ao servidor.');
+      lockScreen('Erro de Rede', 'Não foi possível conectar ao servidor.');
     }
 
     return Promise.reject(error);
