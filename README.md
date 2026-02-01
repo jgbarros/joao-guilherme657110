@@ -6,7 +6,7 @@
 
 [![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%204.0.1-brightgreen)] [![Frontend](https://img.shields.io/badge/Frontend-React%2018-blue)] [![DB](https://img.shields.io/badge/DB-PostgreSQL%2016-orange)] [![Object](https://img.shields.io/badge/Object-MinIO-red)]
 
-## 🔧 Status Atual (30/01/2026)
+## 🔧 Status Atual (01/02/2026)
 - ✅ **Infra Docker**: Postgres + MinIO + Backend UP
 - ✅ **Flyway**: Schema + seed data (users, artistas, albuns, regionais)
 - ✅ **JPA**: Entities Artista/Album/Regional/User
