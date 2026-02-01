@@ -67,14 +67,17 @@ export default function ArtistDetail({ artistId }: ArtistDetailProps) {
     }
 
     const capaBodyTemplate = (rowData: AlbumSummary) => {
-        return (
-            <Image 
-                src={rowData.capaUrl || 'https://via.placeholder.com/50'} 
-                alt={rowData.titulo} 
-                width="50" 
-                preview 
-            />
-        );
+        if (rowData.capaUrl) {
+            return (
+                <Image 
+                    src={rowData.capaUrl} 
+                    alt={rowData.titulo} 
+                    width="50" 
+                    preview 
+                />
+            );
+        }
+        return <i className="pi pi-image" style={{ fontSize: '2rem' }}></i>;
     };
 
     return (
