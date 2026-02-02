@@ -6,7 +6,7 @@
 
 [![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%204.0.1-brightgreen)] [![Frontend](https://img.shields.io/badge/Frontend-React%2018-blue)] [![DB](https://img.shields.io/badge/DB-PostgreSQL%2016-orange)] [![Object](https://img.shields.io/badge/Object-MinIO-red)]
 
-## 🔧 Status Atual (01/02/2026)
+## 🔧 Status Atual (02/02/2026)
 - ✅ **Infra Docker**: Postgres + MinIO + Backend UP
 - ✅ **Flyway**: Schema + seed data (users, artistas, albuns, regionais)
 - ✅ **JPA**: Entities Artista/Album/Regional/User
@@ -24,15 +24,6 @@ cd joao-guilherme657110
 docker compose up -d
 ```
 
-## 🚀 Como rodar o Frontend
-
-```bash
-Abra o VSCode
-Selecione o diretório: /frontend
-npm i
-npm run dev
-```
-
 ### Serviços
 | Serviço | URL | Credenciais |
 |---------|-----|-------------|
@@ -40,7 +31,7 @@ npm run dev
 | **MinIO Console** | [localhost:9001](http://localhost:9001) | `minioadmin` / `minioadmin` |
 | **MinIO Browser** | [localhost:9001/browser](http://localhost:9001) | `minioadmin` / `minioadmin` |
 | **Backend API** | [localhost:8080/](http://localhost:8080) | `admin` / `admin123` |
-| **Frontend** | [localhost:5173](http://localhost:5173) | `admin` / `admin123` |
+| **Frontend** | [localhost:3000](http://localhost:3000) | `admin` / `admin123` |
 | **Swagger UI** | [localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) |
 
 
