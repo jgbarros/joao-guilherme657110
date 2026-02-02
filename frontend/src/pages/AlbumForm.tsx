@@ -8,6 +8,7 @@ import { FileUpload } from 'primereact/fileupload';
 import AlbumFacade from '../facades/AlbumFacade';
 import ArtistFacade from '../facades/ArtistFacade';
 import api from '../api/axios';
+import { showToast } from '../utils/toastService';
 
 interface AlbumFormProps {
   albumId: number | null;
@@ -137,7 +138,6 @@ export default function AlbumForm({ albumId, onSuccess, onCancel }: AlbumFormPro
       }
     }
     
-    const { showToast } = await import('../utils/toastService');
     showToast('error', 'Erro no Upload', typeof errorMessage === 'string' ? errorMessage : 'Falha no upload.');
   };
 
@@ -152,7 +152,13 @@ export default function AlbumForm({ albumId, onSuccess, onCancel }: AlbumFormPro
     }
 
     try {
-      const payload = { ...formData, id: albumId || undefined };
+      const payload = { 
+        ...formData, 
+        id: albumId || undefined,
+        artistaId: formData.artistaId || undefined,
+        anoLancamento: formData.anoLancamento || undefined,
+        regionalId: formData.regionalId || undefined
+      };
       await AlbumFacade.saveAlbum(payload);
       
       toast.current?.show({ 

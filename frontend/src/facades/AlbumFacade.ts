@@ -1,5 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import api from '../api/axios';
+import DashboardFacade from './DashboardFacade';
 
 export interface Album {
   id: number;
@@ -70,7 +71,6 @@ class AlbumFacade {
     await this.fetchAlbums(page, size);
 
     // Atualizar dashboard
-    const { default: DashboardFacade } = await import('./DashboardFacade');
     DashboardFacade.fetchStats().catch(() => {});
   }
 
@@ -90,7 +90,6 @@ class AlbumFacade {
 
     // Atualizar dashboard se for novo álbum
     if (!album.id) {
-      const { default: DashboardFacade } = await import('./DashboardFacade');
       DashboardFacade.fetchStats().catch(() => {});
     }
   }
