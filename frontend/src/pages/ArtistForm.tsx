@@ -95,8 +95,8 @@ export default function ArtistForm({ artistId, onSuccess, onCancel }: ArtistaFor
     const payload = {
       ...formData,
       id: artistId || undefined,
-      dataNascimento: formData.dataNascimento ? formData.dataNascimento.toISOString().split('T')[0] : null,
-      dataMorte: formData.dataMorte ? formData.dataMorte.toISOString().split('T')[0] : null,
+      dataNascimento: formData.dataNascimento ? formData.dataNascimento.toISOString().split('T')[0] : undefined,
+      dataMorte: formData.dataMorte ? formData.dataMorte.toISOString().split('T')[0] : undefined,
     };
 
     try {

@@ -1,5 +1,6 @@
 import { BehaviorSubject, tap } from 'rxjs';
 import api from '../api/axios';
+import DashboardFacade from './DashboardFacade';
 
 export interface Artista {
   id: number;
@@ -67,7 +68,6 @@ class ArtistFacade {
     await this.fetchArtists(page, size);
     
     // Atualizar dashboard se necessário
-    const { default: DashboardFacade } = await import('./DashboardFacade');
     DashboardFacade.fetchStats().catch(() => {});
   }
 
@@ -92,7 +92,6 @@ class ArtistFacade {
 
     // Atualizar dashboard se for novo artista
     if (!artist.id) {
-      const { default: DashboardFacade } = await import('./DashboardFacade');
       DashboardFacade.fetchStats().catch(() => {});
     }
   }
