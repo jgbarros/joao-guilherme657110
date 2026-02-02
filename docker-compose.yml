@@ -40,8 +40,14 @@ services:
         condition: service_healthy  # ← AGUARDA Postgres 100% pronto
     restart: unless-stopped
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   minio_data:
-  
-

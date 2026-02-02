@@ -1,6 +1,14 @@
-FROM eclipse-temurin:21-jre-alpine
+# Estágio de build
+FROM node:20-alpine AS build
 WORKDIR /app
-# Placeholder até mvn package
-RUN echo "Backend placeholder - compile com mvn package primeiro" > README.md
-EXPOSE 8080
-CMD ["tail", "-f", "/dev/null"]  # Mantém container vivo
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Estágio de produção
+FROM nginx:stable-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
